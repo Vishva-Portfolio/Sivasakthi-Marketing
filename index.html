@@ -2246,14 +2246,18 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       _carouselIdx[carouselId] = { idx: 0, imgs };
     }
 
-    // Color swatches HTML
+    // Color swatches HTML — capped so a long color list doesn't overwhelm the card
     let colorHtml = '';
     if (p.colors?.length) {
+      const MAX_SWATCHES = 6;
+      const shownColors = p.colors.slice(0, MAX_SWATCHES);
+      const extraCount = p.colors.length - shownColors.length;
       colorHtml = `
         <div style="margin-top:10px;">
           <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(45,196,160,0.6);margin-bottom:6px;">Available Colors</div>
           <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
-            ${p.colors.map(c=>`<span title="${c.name}" style="display:inline-block;width:20px;height:20px;border-radius:50%;background:${c.hex};border:2px solid rgba(255,255,255,0.15);cursor:pointer;" onclick="event.stopPropagation()"></span>`).join('')}
+            ${shownColors.map(c=>`<span title="${c.name}" style="display:inline-block;width:20px;height:20px;border-radius:50%;background:${c.hex};border:2px solid rgba(255,255,255,0.15);cursor:pointer;" onclick="event.stopPropagation()"></span>`).join('')}
+            ${extraCount > 0 ? `<span style="font-size:10px;font-weight:700;color:rgba(237,245,243,0.45);" onclick="event.stopPropagation()">+${extraCount}</span>` : ''}
           </div>
         </div>`;
     }
@@ -3106,9 +3110,12 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
           priceHtml = `<div style="margin-top:auto;padding-top:8px;"><span style="font-size:11px;color:#bbb;font-style:italic;">Price on request</span></div>`;
         }
 
-        // Colors — dots only, no text
-        const colorsHtml = p.colors?.length
-          ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">${p.colors.map(c=>`<span title="${c.name}" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${c.hex};border:1.5px solid rgba(0,0,0,0.12);"></span>`).join('')}</div>`
+        // Colors — dots only, no text, capped to keep cards tidy
+        const MAX_PDF_SWATCHES = 6;
+        const shownColors = p.colors ? p.colors.slice(0, MAX_PDF_SWATCHES) : [];
+        const extraColorCount = (p.colors?.length || 0) - shownColors.length;
+        const colorsHtml = shownColors.length
+          ? `<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:6px;">${shownColors.map(c=>`<span title="${c.name}" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${c.hex};border:1.5px solid rgba(0,0,0,0.12);"></span>`).join('')}${extraColorCount > 0 ? `<span style="font-size:9px;font-weight:700;color:#999;">+${extraColorCount}</span>` : ''}</div>`
           : '';
 
         const tagHtml = p.tag
