@@ -109,35 +109,18 @@
       position: relative;
       width: 42px; height: 42px;
     }
-    .nav-mono-ring {
-      position: absolute; inset: -5px;
-      border-radius: 10px;
-      border: none;
-      background: transparent;
-      animation: spin-slow 10s linear infinite;
+    .nav-mono-ring { display: none; }
+    @keyframes mono-glow-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(45,196,160,0.35), 0 0 0 1px rgba(45,196,160,0.2) inset; }
+      50% { box-shadow: 0 0 14px 3px rgba(45,196,160,0.45), 0 0 0 1px rgba(45,196,160,0.4) inset; }
     }
-    .nav-mono-ring::before {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 10px;
-      border: 1.5px dashed var(--gold);
-      opacity: 0.7;
-    }
-    .nav-mono-ring::after {
-      content: '';
-      position: absolute;
-      top: -3px; left: 50%; transform: translateX(-50%);
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 8px var(--gold), 0 0 16px rgba(45,196,160,0.5);
-    }
-    @keyframes spin-slow { to { transform: rotate(360deg); } }
     .nav-mono-inner {
       position: relative; z-index: 1;
       width: 42px; height: 42px; border-radius: 50%;
       background: linear-gradient(145deg, #0e2235, #060d18);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       border: 1px solid rgba(45,196,160,0.2);
+      animation: mono-glow-pulse 3s ease-in-out infinite;
     }
     .nav-mono-inner span {
       font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 14px;
@@ -506,7 +489,8 @@
     }
     /* If image is provided */
     .pvisual img {
-      width: 100%; height: 100%; object-fit: cover;
+      width: 100%; height: 100%; object-fit: contain;
+      padding: 8px;
       transition: transform 0.4s;
     }
     .pcard:hover .pvisual img { transform: scale(1.06); }
@@ -516,13 +500,11 @@
 }
 
 .pvisual img {
-  height: 160px;
-  width: 140px;
-        border-radius: 18px; overflow: hidden; transition: all 0.35s;
-      background: rgba(255,255,255,0.035);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(45,196,160,0.22);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  padding: 8px;
+  border-radius: 18px; overflow: hidden; transition: all 0.35s;
 }
 
     .pvisual img:hover {
@@ -1172,8 +1154,15 @@
 .cat-panel-search-row {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   margin-bottom: 18px;
   margin-top: -30px;
+  gap: 0;
+  flex-wrap: wrap;
+}
+@media (max-width: 500px) {
+  .cat-panel-search-row { margin-top: 0; gap: 6px; }
+  .cat-panel-search-row select, .cat-panel-search-row .cat-search-input { width: 100% !important; margin-left: 0 !important; }
 }
 .cat-search-input {
   background: rgba(255,255,255,0.04);
@@ -1410,7 +1399,13 @@
           <div class="cat-panel-subtitle">Quality Products. Trusted by Thousands.</div>
         </div>
         <div class="cat-panel-search-row">
-          <input class="cat-search-input" placeholder="Search products…" oninput="catSearchFilter(this.value)" id="cat-search-box"/>
+          <select id="cat-sort-select" onchange="catSortProducts(this.value)" style="background:rgba(255,255,255,0.04);border:1px solid rgba(45,196,160,0.18);border-radius:8px;padding:8px 28px 8px 10px;font-size:12px;color:rgba(237,245,243,0.65);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;transition:border-color 0.2s;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%232DC4A0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:calc(100% - 9px) center;">
+            <option value="">Sort by Price</option>
+            <option value="low-high">Price: Low → High</option>
+            <option value="high-low">Price: High → Low</option>
+            <option value="default">Default Order</option>
+          </select>
+          <input class="cat-search-input" placeholder="Search products…" oninput="catSearchFilter(this.value)" id="cat-search-box" style="margin-left:8px;"/>
         </div>
       </div>
 
@@ -1715,6 +1710,8 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <div id="adminUserLabel" style="font-size:11px;color:rgba(237,245,243,0.4);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
         <div id="adminRolePill" style="display:none;"></div>
+        <button onclick="closeAdminPanel()" style="background:rgba(45,196,160,0.1);border:1px solid rgba(45,196,160,0.3);color:#7EEBD5;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">← Back to Site</button>
+        <button onclick="printCatalogue()" style="background:rgba(45,196,160,0.15);border:1px solid rgba(45,196,160,0.4);color:#7EEBD5;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">🖨 Print Catalogue</button>
         <button onclick="adminLogout()" style="background:rgba(13,140,114,0.2);border:1px solid rgba(13,140,114,0.4);color:#ff8a8a;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Logout</button>
       </div>
     </div>
@@ -1754,11 +1751,14 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
             <div><label class="flbl">Name</label><input id="fc2-name" class="finput" placeholder="e.g. Furniture"/></div>
             <div><label class="flbl">Icon (emoji)</label><input id="fc2-icon" class="finput" placeholder="🛋️"/></div>
           </div>
-          <div style="margin-bottom:14px;"><label class="flbl">Category Image (optional)</label><div class="dropzone" id="dz-category" onclick="document.getElementById('fi-category').click()"><div class="dz-inner" id="dzi-category">🖼️ Click or drag image here<br><span style="font-size:11px;color:rgba(237,245,243,0.3);">JPG/PNG/WEBP max 1.5MB</span></div><img id="fp-category" style="display:none;max-height:120px;border-radius:8px;margin:0 auto;"/></div><input id="fi-category" type="file" accept="image/*" style="display:none;" onchange="prevImg(event,'category')"/></div>
+          <div style="margin-bottom:14px;"><label class="flbl">Category Image (optional)</label><div class="dropzone" id="dz-category" onclick="document.getElementById('fi-category').click()"><div class="dz-inner" id="dzi-category">🖼️ Click or drag image here<br><span style="font-size:11px;color:rgba(237,245,243,0.3);">JPG/PNG/WEBP, any size — auto-optimized</span></div><img id="fp-category" style="display:none;max-height:120px;border-radius:8px;margin:0 auto;"/></div><input id="fi-category" type="file" accept="image/*" style="display:none;" onchange="prevImg(event,'category')"/></div>
           <div id="msg-category" class="form-msg" style="display:none;"></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;"><button onclick="saveDoc('category')" class="btn-save">Save</button><button onclick="closeForm('category')" class="btn-cancel">Cancel</button></div>
         </div>
-        <div id="list-category" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;"></div>
+        <div id="list-category" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
+          <!-- drag hint -->
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:rgba(45,196,160,0.4);display:flex;align-items:center;gap:6px;"><span style="font-size:14px;">⠿</span> Drag cards to reorder — order reflects on the main page instantly.</div>
       </div>
 
       <!-- ══ PRODUCTS TAB ══ -->
@@ -1820,7 +1820,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
             <div id="multi-img-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;min-height:72px;"></div>
             <!-- Add image button -->
             <div id="dz-product" onclick="document.getElementById('fi-product').click()" style="border:1px dashed rgba(45,196,160,0.3);border-radius:10px;padding:14px;text-align:center;cursor:pointer;background:rgba(45,196,160,0.03);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(45,196,160,0.6)'" onmouseout="this.style.borderColor='rgba(45,196,160,0.3)'">
-              <div id="dzi-product" style="font-size:12px;color:rgba(237,245,243,0.35);">➕ Add Image <span style="font-size:10px;">(JPG/PNG/WEBP max 1.5MB)</span></div>
+              <div id="dzi-product" style="font-size:12px;color:rgba(237,245,243,0.35);">➕ Add Image <span style="font-size:10px;">(JPG/PNG/WEBP, any size — auto-optimized)</span></div>
             </div>
             <input id="fi-product" type="file" accept="image/*" multiple style="display:none;" onchange="addProductImages(event)"/>
             <input type="hidden" id="fp-product"/>
@@ -1834,6 +1834,17 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
               <input type="color" id="color-picker" value="#2DC4A0" style="width:38px;height:38px;border:1px solid rgba(45,196,160,0.3);border-radius:8px;background:none;cursor:pointer;padding:2px;"/>
               <input id="color-name" class="finput" placeholder="Color name (e.g. Brown)" style="flex:1;min-width:120px;max-width:200px;"/>
               <button type="button" onclick="addColor()" style="background:rgba(45,196,160,0.15);border:1px solid rgba(45,196,160,0.3);color:#7EEBD5;border-radius:8px;padding:9px 16px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Add Color</button>
+            </div>
+            <!-- Copy colors from another product -->
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(45,196,160,0.1);">
+              <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(45,196,160,0.5);margin-bottom:8px;">📋 Copy Colors from Another Product</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <select id="copy-color-from" class="finput" style="flex:1;min-width:160px;">
+                  <option value="">— Select a product —</option>
+                </select>
+                <button type="button" id="btn-copy-colors" style="background:rgba(45,196,160,0.12);border:1px solid rgba(45,196,160,0.25);color:#7EEBD5;border-radius:8px;padding:9px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Copy</button>
+              </div>
+              <div id="copy-color-preview" style="display:none;margin-top:8px;flex-wrap:wrap;gap:6px;align-items:center;"></div>
             </div>
           </div>
           <div id="msg-product" class="form-msg" style="display:none;"></div>
@@ -1851,6 +1862,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
           <select id="filter-prod-subcat" class="finput" style="flex:1;min-width:140px;" onchange="filterProdList()"><option value="">All Categories</option></select>
         </div>
         <div id="list-product" style="background:rgba(255,255,255,0.025);border:1px solid rgba(45,196,160,0.12);border-radius:16px;overflow:hidden;"></div>
+        <div style="margin-top:10px;font-size:11px;color:rgba(45,196,160,0.4);display:flex;align-items:center;gap:6px;"><span style="font-size:14px;">⠿</span> Drag rows to reorder — order reflects on the main page instantly.</div>
       </div>
 
       <!-- ══ ROLES TAB (admin only) ══ -->
@@ -1995,25 +2007,57 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
   // ── Cache ──
   window._cache = { catalogues: [], categories: [], products: [] };
 
-  const compress = (file) => new Promise((res, rej) => {
-    if (file.size > 1.5*1024*1024) { rej('Image too large (max 1.5MB)'); return; }
+  // Adaptive compressor: accepts any source file size (no raw-size gate),
+  // starts at high quality/resolution for sharp images, then steps quality
+  // and dimensions down only as far as needed to stay under the Firestore
+  // per-document budget. maxBytes is the target size of the final base64 string.
+  const compressToBudget = (file, maxDim = 1100, maxBytes = 700*1024) => new Promise((res, rej) => {
+    if (!file.type || !file.type.startsWith('image/')) { rej('Please choose an image file'); return; }
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const MAX = 700, canvas = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
-        if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        res(canvas.toDataURL('image/jpeg', 0.78));
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let dim = maxDim, dataUrl = '';
+        const renderAt = (targetDim) => {
+          let w = img.width, h = img.height;
+          if (w > targetDim) { h = Math.round(h*targetDim/w); w = targetDim; }
+          if (h > targetDim) { w = Math.round(w*targetDim/h); h = targetDim; }
+          canvas.width = w; canvas.height = h;
+          ctx.clearRect(0,0,w,h);
+          ctx.drawImage(img,0,0,w,h);
+        };
+        renderAt(dim);
+        let quality = 0.9;
+        dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Step quality down first — preserves sharpness/resolution longer.
+        while (dataUrl.length > maxBytes && quality > 0.45) {
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        // If still too big, shrink resolution and retry quality ladder.
+        while (dataUrl.length > maxBytes && dim > 500) {
+          dim -= 150;
+          renderAt(dim);
+          quality = 0.85;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          while (dataUrl.length > maxBytes && quality > 0.45) {
+            quality -= 0.1;
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+        }
+        res(dataUrl);
       };
-      img.onerror = rej;
+      img.onerror = () => rej('Could not read that image file');
       img.src = e.target.result;
     };
+    reader.onerror = () => rej('Could not read that file');
     reader.readAsDataURL(file);
   });
+  // Single-image slots (catalogue/category): one image per doc, bigger budget.
+  const compress = (file) => compressToBudget(file, 1100, 700*1024);
+  window.compressToBudget = compressToBudget;
 
   // ── Load all data ──
   window.loadAll = async function() {
@@ -2023,10 +2067,20 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       getDocs(collection(db,'products'))
     ]);
     window._cache.catalogues = [];
-    window._cache.categories = cts.docs.map(d=>({id:d.id,...d.data()}));
-    window._cache.products   = ps.docs.map(d=>({id:d.id,...d.data()}));
+    window._cache.categories = cts.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.sortOrder??9999)-(b.sortOrder??9999));
+    window._cache.products   = ps.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.sortOrder??9999)-(b.sortOrder??9999));
     renderFrontend();
     renderAdminLists();
+    // Re-render the currently open category so edits (colors, price, etc.) show immediately
+    const activeState = window._state?.category;
+    if (activeState) {
+      if (activeState === '__offer_zone__') {
+        showOfferZone();
+      } else {
+        const activeCat = window._cache.categories.find(c => c.id === activeState);
+        if (activeCat) showProducts(activeCat.id, activeCat.name);
+      }
+    }
   };
 
   // ════════════════════════════════════════
@@ -2139,6 +2193,8 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     document.getElementById('cat-main-header').style.display = 'block';
     document.getElementById('cat-main-title').textContent = categoryName;
     document.getElementById('cat-search-box').value = '';
+    const sortSel = document.getElementById('cat-sort-select');
+    if (sortSel) sortSel.value = '';
 
     const prods = window._cache.products.filter(p => p.categoryId === categoryId);
     document.getElementById('breadcrumb-prod').textContent = categoryName;
@@ -2166,6 +2222,9 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     const card = document.createElement('div');
     card.className = 'pcard' + (extraClass ? ' '+extraClass : '') + (active ? ' is-offer' : '');
     card.style.cursor = 'pointer';
+    // Store effective price for sorting
+    const effectivePrice = active ? (p.discountPrice || p.regularPrice || 0) : (p.regularPrice || 0);
+    card.dataset.price = effectivePrice;
 
     // Image carousel HTML
     const carouselId = 'car-' + uid;
@@ -2173,11 +2232,11 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     if (imgs.length === 0) {
       imgHtml = `<span style="font-size:56px;">📦</span>`;
     } else if (!hasMulti) {
-      imgHtml = `<img src="${imgs[0]}" style="width:100%;height:100%;object-fit:cover;" data-carid="${carouselId}" data-idx="0"/>`;
+      imgHtml = `<img src="${imgs[0]}" style="width:100%;height:100%;object-fit:contain;padding:8px;" data-carid="${carouselId}" data-idx="0" id="${carouselId}-img"/>`;
     } else {
       imgHtml = `
         <div id="${carouselId}" style="position:relative;width:100%;height:100%;">
-          <img src="${imgs[0]}" style="width:100%;height:100%;object-fit:cover;" id="${carouselId}-img"/>
+          <img src="${imgs[0]}" style="width:100%;height:100%;object-fit:contain;padding:8px;" id="${carouselId}-img"/>
           <button onclick="carPrev(event,'${carouselId}',${imgs.length})" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:#fff;border-radius:50%;width:26px;height:26px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">‹</button>
           <button onclick="carNext(event,'${carouselId}',${imgs.length})" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:none;color:#fff;border-radius:50%;width:26px;height:26px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">›</button>
           <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:2;">
@@ -2193,10 +2252,9 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       colorHtml = `
         <div style="margin-top:10px;">
           <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(45,196,160,0.6);margin-bottom:6px;">Available Colors</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
             ${p.colors.map(c=>`<span title="${c.name}" style="display:inline-block;width:20px;height:20px;border-radius:50%;background:${c.hex};border:2px solid rgba(255,255,255,0.15);cursor:pointer;" onclick="event.stopPropagation()"></span>`).join('')}
           </div>
-          <div style="font-size:10px;color:rgba(237,245,243,0.35);margin-top:4px;">${p.colors.map(c=>c.name).join(', ')}</div>
         </div>`;
     }
 
@@ -2210,7 +2268,6 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         ${tagHtml}
       </div>
       <div class="pbody">
-        ${catLabel ? `<div class="pcat" style="color:${active?'#ff8a8a':''};">${catLabel}</div>` : ''}
         <div class="pname">${p.name}</div>
         <div class="pdesc">${p.description||''}</div>
         ${colorHtml}
@@ -2310,6 +2367,27 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     });
   };
 
+  // Sort by price
+  window.catSortProducts = function(order) {
+    if (!order || order === 'default') {
+      // Re-render from cache with default order
+      const cat = window._state.category;
+      const catName = document.getElementById('cat-main-title').textContent;
+      if (cat === '__offer_zone__') { showOfferZone(); }
+      else if (cat) { showProducts(cat, catName); }
+      return;
+    }
+    const grid = document.getElementById('prod-grid');
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.pcard'));
+    cards.sort((a, b) => {
+      const priceA = parseFloat(a.dataset.price) || 0;
+      const priceB = parseFloat(b.dataset.price) || 0;
+      return order === 'low-high' ? priceA - priceB : priceB - priceA;
+    });
+    cards.forEach(c => grid.appendChild(c));
+  };
+
   // ════════════════════════════════════════
   // ADMIN - Save document
   // ════════════════════════════════════════
@@ -2336,6 +2414,8 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       if (!categoryId || !name) { showMsg('product','Select category and enter name','error'); return; }
       colName = 'products';
       editId = window._editIds?.product;
+      // Preserve sortOrder if editing an existing product
+      const existingProd = editId ? (window._cache.products || []).find(p => p.id === editId) : null;
       data = {
         categoryId, name, tag, description: desc,
         regularPrice:   regularPrice   ? Number(regularPrice)  : null,
@@ -2343,6 +2423,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         offerFrom:      offerFrom  || null,
         offerTo:        offerTo    || null,
         colors: window._productColors || [],
+        ...(existingProd?.sortOrder != null ? { sortOrder: existingProd.sortOrder } : {}),
         updatedAt: new Date().toISOString()
       };
     }
@@ -2361,11 +2442,28 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         data.imageBase64 = window._editImgs?.[type] || '';
       }
       showMsg(type, 'Saving…', 'success');
+      console.log('[SaveDoc] saving product with colors:', data.colors);
       try {
         if (editId) {
           await window._fb.setDoc(window._fb.doc(window._fb.db, colName, editId), data);
+          // Immediately patch local cache so main page updates without waiting for full reload
+          const idx = (window._cache.products || []).findIndex(p => p.id === editId);
+          if (idx !== -1) {
+            window._cache.products[idx] = { ...window._cache.products[idx], ...data, id: editId };
+            console.log('[SaveDoc] patched cache idx', idx, 'colors now:', window._cache.products[idx].colors);
+          }
         } else {
-          await window._fb.addDoc(window._fb.collection(window._fb.db, colName), data);
+          const ref = await window._fb.addDoc(window._fb.collection(window._fb.db, colName), data);
+          // Add to local cache immediately
+          window._cache.products.push({ ...data, id: ref.id });
+        }
+        // Re-render active category immediately so colors/changes show right away
+        const activeCat = window._state?.category;
+        if (activeCat && activeCat !== '__offer_zone__') {
+          const catObj = (window._cache.categories || []).find(c => c.id === activeCat);
+          if (catObj) showProducts(catObj.id, catObj.name);
+        } else if (activeCat === '__offer_zone__') {
+          showOfferZone();
         }
         showMsg(type, '✅ Saved!', 'success');
         setTimeout(() => { closeForm(type); loadAll(); }, 1000);
@@ -2411,12 +2509,17 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     const lct = document.getElementById('list-category');
     lct.innerHTML = '';
     if (!categories.length) { lct.innerHTML = '<div style="color:rgba(237,245,243,0.3);padding:32px;text-align:center;grid-column:1/-1;">No categories yet.</div>'; }
-    categories.forEach(c => {
+    categories.forEach((c, idx) => {
       const card = document.createElement('div');
       card.className = 'admin-card';
+      card.draggable = true;
+      card.dataset.id = c.id;
+      card.dataset.type = 'category';
+      card.style.cursor = 'grab';
       card.innerHTML = `
-        <div style="height:110px;background:rgba(45,196,160,0.05);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <div style="height:110px;background:rgba(45,196,160,0.05);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;">
           ${c.imageBase64 ? `<img src="${c.imageBase64}" style="width:100%;height:100%;object-fit:cover;"/>` : `<span style="font-size:40px;">${c.icon||'🏷️'}</span>`}
+          <div style="position:absolute;top:6px;left:8px;background:rgba(0,0,0,0.45);border-radius:6px;padding:3px 7px;font-size:9px;color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:4px;pointer-events:none;">⠿ drag to reorder</div>
         </div>
         <div style="padding:14px;">
           <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:#7EEBD5;margin-bottom:10px;">${c.name}</div>
@@ -2427,6 +2530,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         </div>`;
       lct.appendChild(card);
     });
+    initDragSort(lct, 'categories');
 
     // --- Products list ---
     populateCategorySelects();
@@ -2475,10 +2579,14 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     filtered.forEach(p => {
       const subcat = categories.find(x=>x.id===p.categoryId);
       const row = document.createElement('div');
-      row.style.cssText = 'padding:14px 18px;border-bottom:1px solid rgba(45,196,160,0.07);display:flex;align-items:center;gap:14px;transition:background 0.2s;flex-wrap:wrap;';
+      row.style.cssText = 'padding:14px 18px;border-bottom:1px solid rgba(45,196,160,0.07);display:flex;align-items:center;gap:14px;transition:background 0.2s;flex-wrap:wrap;cursor:grab;';
+      row.draggable = true;
+      row.dataset.id = p.id;
+      row.dataset.type = 'product';
       row.onmouseover = () => row.style.background='rgba(45,196,160,0.04)';
       row.onmouseout  = () => row.style.background='';
       row.innerHTML = `
+        <div style="color:rgba(45,196,160,0.3);font-size:18px;cursor:grab;flex-shrink:0;" title="Drag to reorder">⠿</div>
         <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(45,196,160,0.08);display:flex;align-items:center;justify-content:center;">
           ${p.imageBase64 ? `<img src="${p.imageBase64}" style="width:100%;height:100%;object-fit:cover;"/>` : '📦'}
         </div>
@@ -2495,6 +2603,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         ${!isStaff ? `<button onclick="deleteDoc2('products','${p.id}')" style="background:rgba(13,140,114,0.15);border:1px solid rgba(13,140,114,0.3);color:#ff8a8a;border-radius:7px;padding:7px 10px;font-size:11px;cursor:pointer;">🗑</button>` : ''}`;
       list.appendChild(row);
     });
+    initDragSort(list, 'products');
   };
 
   // ── Edit item ──
@@ -2536,6 +2645,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       // Load colors
       window._productColors = item.colors ? [...item.colors] : [];
       renderColorChips();
+      populateCopyColorDropdown();
     }
 
     if (type !== 'product' && item.imageBase64) {
@@ -2760,6 +2870,107 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     }
   })();
 
+  // ════════════════════════════════════════
+  // DRAG-AND-DROP SORT ENGINE
+  // ════════════════════════════════════════
+  window._dragSrc = null;
+
+  window.initDragSort = function(container, colName) {
+    const items = [...container.children];
+    items.forEach(item => {
+      if (!item.dataset.id) return; // skip empty/placeholder divs
+
+      item.addEventListener('dragstart', e => {
+        window._dragSrc = item;
+        item.style.opacity = '0.45';
+        item.style.outline = '2px dashed rgba(45,196,160,0.6)';
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', item.dataset.id);
+      });
+
+      item.addEventListener('dragend', () => {
+        item.style.opacity = '';
+        item.style.outline = '';
+        // Clear all drop indicators
+        [...container.children].forEach(c => {
+          c.style.borderTop = '';
+          c.style.borderBottom = '';
+          c.style.boxShadow = '';
+        });
+      });
+
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (item === window._dragSrc) return;
+        // Visual indicator
+        [...container.children].forEach(c => { c.style.borderTop=''; c.style.borderBottom=''; });
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          item.style.borderTop = '2px solid rgba(45,196,160,0.8)';
+        } else {
+          item.style.borderBottom = '2px solid rgba(45,196,160,0.8)';
+        }
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.style.borderTop = '';
+        item.style.borderBottom = '';
+      });
+
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!window._dragSrc || window._dragSrc === item) return;
+        item.style.borderTop = '';
+        item.style.borderBottom = '';
+
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        if (e.clientY < midY) {
+          container.insertBefore(window._dragSrc, item);
+        } else {
+          container.insertBefore(window._dragSrc, item.nextSibling);
+        }
+
+        saveSortOrder(container, colName);
+      });
+    });
+  };
+
+  window.saveSortOrder = async function(container, colName) {
+    const { db, doc, setDoc } = window._fb;
+    const items = [...container.children].filter(el => el.dataset.id);
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:80px;right:22px;background:rgba(45,196,160,0.15);border:1px solid rgba(45,196,160,0.4);color:#7EEBD5;border-radius:10px;padding:10px 18px;font-size:12px;font-weight:700;z-index:99999;backdrop-filter:blur(12px);transition:opacity 0.4s;';
+    toast.textContent = '💾 Saving order…';
+    document.body.appendChild(toast);
+
+    try {
+      await Promise.all(items.map((el, i) =>
+        setDoc(doc(db, colName, el.dataset.id), { sortOrder: i }, { merge: true })
+      ));
+      // Update local cache order too
+      if (colName === 'categories') {
+        const ordered = items.map(el => window._cache.categories.find(c=>c.id===el.dataset.id)).filter(Boolean);
+        ordered.forEach((c,i) => c.sortOrder = i);
+        window._cache.categories = ordered;
+        renderFrontend();
+      } else {
+        const ordered = items.map(el => window._cache.products.find(p=>p.id===el.dataset.id)).filter(Boolean);
+        ordered.forEach((p,i) => p.sortOrder = i);
+        window._cache.products = ordered;
+        renderFrontend();
+      }
+      toast.textContent = '✅ Order saved!';
+      toast.style.background = 'rgba(45,196,160,0.2)';
+    } catch(e) {
+      toast.textContent = '❌ Save failed: ' + e.message;
+      toast.style.color = '#ff8a8a';
+    }
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(()=>toast.remove(),400); }, 2000);
+  };
+
   // load frontend on page load (no auth required for reading)
   loadAll();
 </script>
@@ -2848,6 +3059,180 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     document.body.style.overflow='';
   }
 
+  function closeAdminPanel(){
+    document.getElementById('adminPanel').style.display='none';
+    document.body.style.overflow='';
+  }
+
+  // ════════════════════════════════════════
+  // PRINT CATALOGUE — Category-wise PDF
+  // ════════════════════════════════════════
+  window.printCatalogue = function() {
+    const { categories, products } = window._cache;
+    if (!categories.length && !products.length) {
+      alert('No data to print yet. Add some categories and products first.');
+      return;
+    }
+
+    const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+
+    // ── Build category sections (card grid layout) ──
+    let sectionsHtml = '';
+    categories.forEach(cat => {
+      const catProds = products.filter(p => p.categoryId === cat.id);
+      if (!catProds.length) return;
+
+      let cardsHtml = '';
+      catProds.forEach(p => {
+        const imgs = p.images?.length ? p.images : (p.imageBase64 ? [p.imageBase64] : []);
+        const imgTag = imgs[0]
+          ? `<img src="${imgs[0]}" style="width:100%;height:130px;object-fit:contain;background:#f8f9fa;display:block;"/>`
+          : `<div style="width:100%;height:130px;background:#f0f4f2;display:flex;align-items:center;justify-content:center;font-size:40px;">📦</div>`;
+
+        // Price
+        let priceHtml = '';
+        const now = new Date(); const d = s => s ? new Date(s) : null;
+        const isOffer = p.discountPrice && (!p.offerFrom || d(p.offerFrom) <= now) && (!p.offerTo || d(p.offerTo) >= now);
+        if (isOffer) {
+          const pct = p.regularPrice ? Math.round((1 - p.discountPrice/p.regularPrice)*100) : 0;
+          priceHtml = `<div style="margin-top:auto;padding-top:8px;">
+            <span style="font-size:16px;font-weight:800;color:#c0392b;">₹${Number(p.discountPrice).toLocaleString('en-IN')}</span>
+            ${p.regularPrice ? `<span style="font-size:11px;color:#bbb;text-decoration:line-through;margin-left:5px;">₹${Number(p.regularPrice).toLocaleString('en-IN')}</span>` : ''}
+            ${pct ? `<span style="background:#c0392b;color:#fff;font-size:8px;font-weight:800;padding:2px 5px;border-radius:3px;margin-left:4px;vertical-align:middle;">${pct}% OFF</span>` : ''}
+          </div>`;
+        } else if (p.regularPrice) {
+          priceHtml = `<div style="margin-top:auto;padding-top:8px;"><span style="font-size:16px;font-weight:800;color:#0d6b50;">₹${Number(p.regularPrice).toLocaleString('en-IN')}</span></div>`;
+        } else {
+          priceHtml = `<div style="margin-top:auto;padding-top:8px;"><span style="font-size:11px;color:#bbb;font-style:italic;">Price on request</span></div>`;
+        }
+
+        // Colors — dots only, no text
+        const colorsHtml = p.colors?.length
+          ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">${p.colors.map(c=>`<span title="${c.name}" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${c.hex};border:1.5px solid rgba(0,0,0,0.12);"></span>`).join('')}</div>`
+          : '';
+
+        const tagHtml = p.tag
+          ? `<div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#0d6b50,#2DC4A0);color:#fff;font-size:8px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase;">${p.tag}</div>`
+          : '';
+
+        cardsHtml += `
+          <div style="border:1.5px solid #c8dfd6;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;background:#fff;box-shadow:0 3px 12px rgba(13,79,56,0.10),0 1px 3px rgba(0,0,0,0.06);page-break-inside:avoid;">
+            <div style="position:relative;background:#f0f6f3;border-bottom:1.5px solid #c8dfd6;">${imgTag}${tagHtml}</div>
+            <div style="padding:10px 12px;display:flex;flex-direction:column;flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#0f1f16;line-height:1.3;">${p.name}</div>
+              ${p.description ? `<div style="font-size:10px;color:#777;margin-top:3px;line-height:1.45;">${p.description}</div>` : ''}
+              ${colorsHtml}
+              ${priceHtml}
+            </div>
+          </div>`;
+      });
+
+      const catIcon = cat.icon || '🏷️';
+      sectionsHtml += `
+        <div style="margin-bottom:36px;page-break-inside:avoid;">
+          <!-- Category header -->
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #2DC4A0;">
+            <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#0a3d30,#1a7a62);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+              ${cat.imageBase64
+                ? `<img src="${cat.imageBase64}" style="width:100%;height:100%;object-fit:cover;"/>`
+                : `<span style="font-size:20px;line-height:1;">${catIcon}</span>`}
+            </div>
+            <div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:#0a3d30;line-height:1.1;">${cat.name}</div>
+              <div style="font-size:10px;color:#2DC4A0;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px;">${catProds.length} product${catProds.length!==1?'s':''}</div>
+            </div>
+          </div>
+          <!-- 3-column product grid -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            ${cardsHtml}
+          </div>
+        </div>`;
+    });
+
+    const totalProds = products.length;
+    const totalCats  = categories.filter(c => products.some(p=>p.categoryId===c.id)).length;
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sivasakthi Marketing – Product Catalogue</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:#f4f7f5;color:#0f1f16;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    @page{size:A4;margin:0;}
+    @media print{
+      body{background:#fff;padding:10mm 10mm;}
+      .no-print{display:none!important;}
+      .page-wrap{box-shadow:none;margin:0;border-radius:0;}
+    }
+    .page-wrap{max-width:720px;margin:0 auto;background:#fff;padding:32px 36px;box-shadow:0 4px 40px rgba(0,0,0,0.10);border-radius:4px;}
+
+    /* ── Cover ── */
+    .cover{position:relative;background:linear-gradient(135deg,#062418 0%,#0d4f38 55%,#1a7a62 100%);border-radius:12px;padding:40px 36px 32px;margin-bottom:36px;overflow:hidden;color:#fff;}
+    .cover::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(45,196,160,0.12);}
+    .cover::before{content:'';position:absolute;left:-30px;bottom:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.04);}
+    .cover-badge{display:inline-block;background:rgba(45,196,160,0.25);border:1px solid rgba(45,196,160,0.4);color:#7EEBD5;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:4px 14px;border-radius:100px;margin-bottom:14px;}
+    .cover-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;line-height:1.1;margin-bottom:6px;}
+    .cover-addr{font-size:11px;color:rgba(255,255,255,0.55);margin-top:10px;line-height:1.7;}
+    .cover-stats{display:flex;gap:0;margin-top:24px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;background:rgba(0,0,0,0.15);}
+    .cover-stat{flex:1;padding:14px 18px;text-align:center;border-right:1px solid rgba(255,255,255,0.08);}
+    .cover-stat:last-child{border-right:none;}
+    .stat-n{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#7EEBD5;line-height:1;}
+    .stat-l{font-size:9px;color:rgba(255,255,255,0.45);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
+
+    .print-btn{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#0d4f38,#2DC4A0);color:#fff;border:none;border-radius:10px;padding:12px 26px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(13,79,56,0.4);z-index:999;display:flex;align-items:center;gap:8px;}
+    .print-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(13,79,56,0.5);}
+
+    .footer{text-align:center;margin-top:40px;padding:20px 0 8px;border-top:1px solid #e0ede8;font-size:10px;color:#aaa;line-height:1.8;}
+    .footer strong{color:#1a7a62;}
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-badge">Wholesale Catalogue ${today}</div>
+    <div class="cover-title">Sivasakthi<br/>Marketing</div>
+    <div class="cover-addr">
+      14/149, Udangudi Road, Naduvakurichi, Sathankulam (Tk), Thoothukudi – 628653<br/>
+      📞 9944966353 &nbsp;·&nbsp; Wholesale Distributor Since 2015
+    </div>
+    <div class="cover-stats">
+      <div class="cover-stat"><div class="stat-n">${totalCats}</div><div class="stat-l">Categories</div></div>
+      <div class="cover-stat"><div class="stat-n">${totalProds}</div><div class="stat-l">Products</div></div>
+      <div class="cover-stat"><div class="stat-n">${today}</div><div class="stat-l">Generated</div></div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  ${sectionsHtml || '<p style="text-align:center;color:#aaa;padding:40px;">No products to display.</p>'}
+
+  <!-- Footer -->
+  <div class="footer">
+    <strong>Sivasakthi Marketing</strong> &nbsp;·&nbsp; Wholesale Distributor Since 2015<br/>
+    14/149, Udangudi Road, Naduvakurichi, Sathankulam (Tk), Thoothukudi – 628653 &nbsp;·&nbsp; 📞 9944966353<br/>
+    Prices are wholesale rates and subject to change. All prices in INR (₹).
+  </div>
+
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">🖨 Save as PDF / Print</button>
+
+<script>
+  window.addEventListener('load',()=>{ setTimeout(()=>document.querySelector('.print-btn')?.focus(),600); });
+<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=960,height=780');
+    if (!win) { alert('Pop-up blocked. Please allow pop-ups and try again.'); return; }
+    win.document.write(html);
+    win.document.close();
+  }
+
   // ── Admin tabs ──
   function aTab(t) {
     ['category','product','roles'].forEach(x => {
@@ -2888,6 +3273,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         window._productColors = [];
         renderProductImageThumbs();
         renderColorChips();
+        populateCopyColorDropdown();
       }
       // reset image preview (only for category)
       if (type === 'category') {
@@ -2956,26 +3342,11 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     renderProductImageThumbs();
   };
 
+  // Up to 5 images share one Firestore document (1MB hard cap), so each
+  // image gets a smaller budget than a single-image slot, but still far
+  // sharper than the old fixed 700px/0.78 setting.
   async function compressImg(file) {
-    return new Promise((res, rej) => {
-      if (file.size > 1.5*1024*1024) { rej('Image too large (max 1.5MB)'); return; }
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          const MAX = 700, canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
-          if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img,0,0,w,h);
-          res(canvas.toDataURL('image/jpeg', 0.78));
-        };
-        img.onerror = rej;
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
+    return window.compressToBudget(file, 1000, 170*1024);
   }
 
   window.renderProductImageThumbs = function() {
@@ -2992,7 +3363,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       container.appendChild(wrap);
     });
     const dzi = document.getElementById('dzi-product');
-    if (dzi) dzi.textContent = window._productImages.length >= 5 ? 'Max 5 images reached' : `➕ Add Image (${window._productImages.length}/5) — JPG/PNG/WEBP max 1.5MB`;
+    if (dzi) dzi.textContent = window._productImages.length >= 5 ? 'Max 5 images reached' : `➕ Add Image (${window._productImages.length}/5) — any size, auto-optimized`;
   };
 
   window.removeProductImage = function(idx) {
@@ -3032,6 +3403,98 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
       container.appendChild(chip);
     });
   };
+
+  // ── Copy colors from another product ──
+  window.populateCopyColorDropdown = function() {
+    var sel = document.getElementById('copy-color-from');
+    if (!sel) return;
+    var currentId = window._editIds && window._editIds.product ? window._editIds.product : null;
+    var products = (window._cache.products || []).filter(function(p){ return p.colors && p.colors.length && p.id !== currentId; });
+    sel.innerHTML = '<option value="">— Select a product —</option>';
+    products.forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name + ' (' + p.colors.length + ' color' + (p.colors.length !== 1 ? 's' : '') + ')';
+      sel.appendChild(opt);
+    });
+    var preview = document.getElementById('copy-color-preview');
+    if (preview) { preview.innerHTML = ''; preview.style.display = 'none'; }
+  };
+
+  window.previewCopyColors = function(productId) {
+    var preview = document.getElementById('copy-color-preview');
+    if (!preview) return;
+    if (!productId) { preview.innerHTML = ''; preview.style.display = 'none'; return; }
+    var prod = (window._cache.products || []).find(function(p){ return p.id === productId; });
+    if (!prod || !prod.colors || !prod.colors.length) { preview.innerHTML = ''; preview.style.display = 'none'; return; }
+    preview.style.display = 'flex';
+    preview.innerHTML = prod.colors.map(function(c) {
+      return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px 3px 5px;border-radius:14px;border:1px solid rgba(45,196,160,0.15);background:rgba(255,255,255,0.03);font-size:10px;color:rgba(237,245,243,0.55);"><span style="width:12px;height:12px;border-radius:50%;background:' + c.hex + ';border:1px solid rgba(255,255,255,0.2);display:inline-block;flex-shrink:0;"></span>' + c.name + '</span>';
+    }).join('');
+  };
+
+  function doCopyColors() {
+    var sel = document.getElementById('copy-color-from');
+    if (!sel || !sel.value) { alert('Select a product first'); return; }
+    var prod = (window._cache.products || []).find(function(p){ return p.id === sel.value; });
+    if (!prod || !prod.colors || !prod.colors.length) { alert('That product has no colors saved.'); return; }
+    if (!window._productColors) window._productColors = [];
+    var added = 0;
+    prod.colors.forEach(function(c) {
+      if (window._productColors.length >= 12) return;
+      var dup = window._productColors.some(function(e){ return e.hex.toLowerCase() === c.hex.toLowerCase() && e.name.toLowerCase() === c.name.toLowerCase(); });
+      if (!dup) { window._productColors.push({ name: c.name, hex: c.hex }); added++; }
+    });
+    // Directly rebuild chips
+    var chips = document.getElementById('color-chips');
+    if (chips) {
+      chips.innerHTML = '';
+      window._productColors.forEach(function(c, i) {
+        var d = document.createElement('div');
+        d.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:20px;border:1px solid rgba(45,196,160,0.2);background:rgba(255,255,255,0.04);';
+        var swatch = document.createElement('span');
+        swatch.style.cssText = 'width:18px;height:18px;border-radius:50%;background:' + c.hex + ';border:1px solid rgba(255,255,255,0.2);flex-shrink:0;display:inline-block;';
+        var label = document.createElement('span');
+        label.style.cssText = 'font-size:11px;color:rgba(237,245,243,0.75);';
+        label.textContent = c.name;
+        var removeBtn = document.createElement('button');
+        removeBtn.textContent = '✕';
+        removeBtn.style.cssText = 'background:none;border:none;color:rgba(237,245,243,0.35);cursor:pointer;font-size:12px;padding:0;line-height:1;';
+        removeBtn.setAttribute('data-idx', i);
+        removeBtn.addEventListener('click', function(){ window._productColors.splice(parseInt(this.getAttribute('data-idx')), 1); renderColorChips(); });
+        d.appendChild(swatch); d.appendChild(label); d.appendChild(removeBtn);
+        chips.appendChild(d);
+      });
+    }
+    sel.value = '';
+    var preview = document.getElementById('copy-color-preview');
+    if (preview) { preview.innerHTML = ''; preview.style.display = 'none'; }
+    var msg = document.getElementById('msg-product');
+    if (msg) {
+      msg.textContent = added > 0 ? '✅ ' + added + ' color' + (added !== 1 ? 's' : '') + ' copied — NOT saved yet! Click the green Save button below to apply.' : 'Already added.';
+      msg.style.display = 'block';
+      msg.style.color = added > 0 ? '#86efac' : '#7EEBD5';
+      msg.style.background = added > 0 ? 'rgba(22,101,52,0.22)' : 'rgba(45,196,160,0.07)';
+      msg.style.border = '1px solid ' + (added > 0 ? 'rgba(22,101,52,0.4)' : 'rgba(45,196,160,0.2)');
+      msg.style.fontWeight = '700';
+      if (added === 0) { setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
+    }
+  }
+
+  // Wire up Copy button via event listener (avoids any onclick attribute escaping issues)
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('btn-copy-colors');
+    if (btn) btn.addEventListener('click', doCopyColors);
+    var sel = document.getElementById('copy-color-from');
+    if (sel) sel.addEventListener('change', function(){ window.previewCopyColors(this.value); });
+  });
+  // Also wire immediately in case DOM already ready
+  (function() {
+    var btn = document.getElementById('btn-copy-colors');
+    if (btn) btn.addEventListener('click', doCopyColors);
+    var sel = document.getElementById('copy-color-from');
+    if (sel) sel.addEventListener('change', function(){ window.previewCopyColors(this.value); });
+  })();
 
   function showMsg(type, msg, kind) {
     const el = document.getElementById('msg-'+type);
@@ -3252,6 +3715,105 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
     ctx.closePath();
   }
 
+  // ── Colour utilities for adaptive, product-aware backdrop ───────
+  function _rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = 0; s = 0; }
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d) + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        default: h = (r - g) / d + 4;
+      }
+      h /= 6;
+    }
+    return [h * 360, s, l];
+  }
+
+  function _hslToRgb(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360;
+    let r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function _rgbStr([r, g, b], a) {
+    return a === undefined ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${a})`;
+  }
+
+  // Sample the loaded product image to find its dominant colour,
+  // ignoring near-black/near-white pixels which are usually background, not product.
+  function _detectDominantColor(img) {
+    try {
+      const sw = 48, sh = Math.max(1, Math.round(sw * img.height / img.width));
+      const c = document.createElement('canvas');
+      c.width = sw; c.height = sh;
+      const cx = c.getContext('2d', { willReadFrequently: true });
+      cx.drawImage(img, 0, 0, sw, sh);
+      const data = cx.getImageData(0, 0, sw, sh).data;
+
+      let rSum = 0, gSum = 0, bSum = 0, count = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+        if (a < 200) continue;
+        const lum = (r + g + b) / 3;
+        if (lum > 244 || lum < 14) continue; // skip background-ish white/black
+        rSum += r; gSum += g; bSum += b; count++;
+      }
+      if (count < sw) { // not enough "product" pixels found, fall back to a full average
+        rSum = 0; gSum = 0; bSum = 0; count = 0;
+        for (let i = 0; i < data.length; i += 4) { rSum += data[i]; gSum += data[i+1]; bSum += data[i+2]; count++; }
+      }
+      if (!count) return null;
+      return { r: rSum / count, g: gSum / count, b: bSum / count };
+    } catch (e) {
+      return null; // canvas read failed — caller falls back to a neutral theme
+    }
+  }
+
+  // Build a tasteful dark "studio" backdrop palette tied to the product's hue —
+  // always kept dark & muted so text stays readable, regardless of how bright/saturated the product is.
+  // Covers BOTH the photo stage (top, mid, bot) and the text panel below it (panelTop/Mid/Bot, line1/line2),
+  // so the whole card reads as one cohesive colour, not two unrelated background blocks stacked together.
+  function _studioPaletteFromColor(dom) {
+    if (!dom) return null;
+    const [h, s] = _rgbToHsl(dom.r, dom.g, dom.b);
+    const sat = Math.min(0.5, s * 0.7 + 0.12);
+    return {
+      // photo stage
+      top:  _hslToRgb(h, sat, 0.20),
+      mid:  _hslToRgb(h, sat * 0.9, 0.13),
+      bot:  _hslToRgb(h, sat * 0.8, 0.06),
+      spot: _hslToRgb(h, Math.min(0.65, s * 0.8 + 0.25), 0.58),
+      // text panel — starts where the photo stage ends, then deepens further
+      panelTop: _hslToRgb(h, sat * 0.8, 0.065),
+      panelMid: _hslToRgb(h, sat * 0.7, 0.038),
+      panelBot: _hslToRgb(h, sat * 0.6, 0.018),
+      // accent line between photo and panel, and minor dividers
+      line1: _hslToRgb(h, Math.min(0.55, s * 0.6 + 0.2), 0.45),
+      line2: _hslToRgb(h, Math.min(0.6, s * 0.7 + 0.25), 0.62)
+    };
+  }
+
   // Parse the structured message into data fields
   function _parseProductMsg(msgText) {
     const lines = msgText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -3281,49 +3843,105 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
 
   // ── Build the premium merged canvas ──────────────────────────────
   function _buildMergedCanvas(imgBase64, msgText) {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
       const W = 900;
       const data = _parseProductMsg(msgText);
+      const SHOP_PHONE = '9944966353';
 
-      // ── Colours ──
-      const BG_TOP    = '#0d1f13';
-      const BG_MID    = '#102318';
-      const BG_BOT    = '#0a1810';
-      const GOLD      = '#D4A848';
-      const GOLD2     = '#F0C86A';
-      const WHITE     = '#FFFFFF';
-      const GREEN_LT  = '#A8F0B8';
-      const GREEN_DIM = 'rgba(168,240,184,0.55)';
+      // Make sure brand fonts are actually loaded before we draw text on canvas
+      try {
+        await Promise.all([
+          document.fonts.load('700 32px "Cormorant Garamond"'),
+          document.fonts.load('italic 600 22px "Cormorant Garamond"'),
+          document.fonts.load('500 20px "DM Sans"'),
+          document.fonts.load('700 20px "DM Sans"')
+        ]);
+        await document.fonts.ready;
+      } catch (e) { /* fall back silently to default fonts */ }
+
+      // ── Colours — "Espresso & Copper" theme ──
+      const BG_TOP    = '#1c0f08';
+      const BG_MID    = '#26150a';
+      const BG_BOT    = '#110906';
+      const GOLD      = '#C97B3D';   // copper
+      const GOLD2     = '#F0B860';   // light amber
+      const WHITE     = '#FFF6EC';   // warm cream
+      const GREEN_LT  = '#7CF2B0';   // mint accent for price
+      const GREEN_DIM = 'rgba(124,242,176,0.6)';
       const RED_OFF   = '#FF6B6B';
       const CARD_BG   = 'rgba(255,255,255,0.04)';
+      const FONT_HEAD = '"Cormorant Garamond", Georgia, serif';
+      const FONT_BODY = '"DM Sans", Arial, sans-serif';
 
-      const _drawCard = (canvas, imgH) => {
+      const _drawCard = (canvas, imgH, imgDraw) => {
         const ctx = canvas.getContext('2d');
         const H   = canvas.height;
         const PAD = 48;
         const IW  = W - PAD * 2;   // inner width
 
-        // ── Background gradient ──
+        // ── Product image zone — soft studio backdrop tinted to the product's own colour, full product visible (no crop/zoom) ──
+        if (imgH > 0 && imgDraw) {
+          const pal = imgDraw.palette; // null-safe fallback below
+          const imgGrad = ctx.createLinearGradient(0, 0, 0, imgH);
+          if (pal) {
+            imgGrad.addColorStop(0,    _rgbStr(pal.top));
+            imgGrad.addColorStop(0.55, _rgbStr(pal.mid));
+            imgGrad.addColorStop(1,    _rgbStr(pal.bot));
+          } else {
+            imgGrad.addColorStop(0,   '#3a2414');
+            imgGrad.addColorStop(0.55,'#2a1810');
+            imgGrad.addColorStop(1,   '#1c0f08');
+          }
+          ctx.fillStyle = imgGrad;
+          ctx.fillRect(0, 0, W, imgH);
+
+          const spot = ctx.createRadialGradient(W/2, imgH * 0.42, 0, W/2, imgH * 0.42, W * 0.62);
+          spot.addColorStop(0,   pal ? _rgbStr(pal.spot, 0.20) : 'rgba(240,184,96,0.16)');
+          spot.addColorStop(1,   'transparent');
+          ctx.fillStyle = spot;
+          ctx.fillRect(0, 0, W, imgH);
+
+          // grounding shadow beneath product
+          const shadowY = imgDraw.dy + imgDraw.dh - imgDraw.dh * 0.04;
+          const shadow = ctx.createRadialGradient(W/2, shadowY, 0, W/2, shadowY, imgDraw.dw * 0.55);
+          shadow.addColorStop(0,   'rgba(0,0,0,0.35)');
+          shadow.addColorStop(1,   'transparent');
+          ctx.fillStyle = shadow;
+          ctx.fillRect(0, shadowY - imgDraw.dh * 0.08, W, imgDraw.dh * 0.16);
+
+          ctx.drawImage(imgDraw.img, imgDraw.dx, imgDraw.dy, imgDraw.dw, imgDraw.dh);
+        }
+
+        // ── Background gradient — now tinted to match the photo stage above it, not a fixed brown ──
+        const pal = imgDraw && imgDraw.palette; // re-grab; also used below for border/glow
         const bgGrad = ctx.createLinearGradient(0, imgH, 0, H);
-        bgGrad.addColorStop(0,   BG_TOP);
-        bgGrad.addColorStop(0.4, BG_MID);
-        bgGrad.addColorStop(1,   BG_BOT);
+        if (pal) {
+          bgGrad.addColorStop(0,   _rgbStr(pal.panelTop));
+          bgGrad.addColorStop(0.4, _rgbStr(pal.panelMid));
+          bgGrad.addColorStop(1,   _rgbStr(pal.panelBot));
+        } else {
+          bgGrad.addColorStop(0,   BG_TOP);
+          bgGrad.addColorStop(0.4, BG_MID);
+          bgGrad.addColorStop(1,   BG_BOT);
+        }
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, imgH, W, H - imgH);
 
         // Subtle radial glow top-center
         const glow = ctx.createRadialGradient(W/2, imgH + 60, 0, W/2, imgH + 60, 320);
-        glow.addColorStop(0,   'rgba(80,200,120,0.10)');
+        glow.addColorStop(0,   pal ? _rgbStr(pal.spot, 0.12) : 'rgba(240,184,96,0.10)');
         glow.addColorStop(1,   'transparent');
         ctx.fillStyle = glow;
         ctx.fillRect(0, imgH, W, H - imgH);
 
-        // ── Gold top border ──
+        // ── Top border — tinted to match the product, instead of a fixed copper line ──
+        const lineA = pal ? _rgbStr(pal.line2) : GOLD2;
+        const lineB = pal ? _rgbStr(pal.line1) : GOLD;
         const borderGrad = ctx.createLinearGradient(0, 0, W, 0);
         borderGrad.addColorStop(0,    'transparent');
-        borderGrad.addColorStop(0.2,  GOLD);
-        borderGrad.addColorStop(0.5,  GOLD2);
-        borderGrad.addColorStop(0.8,  GOLD);
+        borderGrad.addColorStop(0.2,  lineB);
+        borderGrad.addColorStop(0.5,  lineA);
+        borderGrad.addColorStop(0.8,  lineB);
         borderGrad.addColorStop(1,    'transparent');
         ctx.strokeStyle = borderGrad;
         ctx.lineWidth = 3;
@@ -3336,12 +3954,12 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
 
         // ── Shop name header ──
         if (data.shopName) {
-          ctx.font = 'bold 28px Georgia, serif';
+          ctx.font = `700 28px ${FONT_HEAD}`;
           const shopW = ctx.measureText(data.shopName).width;
           // Underline glow behind shop name
           const shopGlow = ctx.createLinearGradient((W - shopW)/2 - 20, 0, (W + shopW)/2 + 20, 0);
           shopGlow.addColorStop(0, 'transparent');
-          shopGlow.addColorStop(0.5, 'rgba(212,168,72,0.18)');
+          shopGlow.addColorStop(0.5, 'rgba(201,123,61,0.20)');
           shopGlow.addColorStop(1, 'transparent');
           ctx.fillStyle = shopGlow;
           ctx.fillRect((W - shopW)/2 - 20, y - 6, shopW + 40, 40);
@@ -3354,8 +3972,8 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
           // Thin divider
           const div1 = ctx.createLinearGradient(0, 0, W, 0);
           div1.addColorStop(0,   'transparent');
-          div1.addColorStop(0.3, 'rgba(212,168,72,0.4)');
-          div1.addColorStop(0.7, 'rgba(212,168,72,0.4)');
+          div1.addColorStop(0.3, 'rgba(201,123,61,0.4)');
+          div1.addColorStop(0.7, 'rgba(201,123,61,0.4)');
           div1.addColorStop(1,   'transparent');
           ctx.strokeStyle = div1;
           ctx.lineWidth = 1;
@@ -3365,7 +3983,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
 
         // ── Product name ──
         if (data.productName) {
-          ctx.font = 'bold 34px Georgia, serif';
+          ctx.font = `700 34px ${FONT_HEAD}`;
           ctx.fillStyle = WHITE;
           ctx.textAlign = 'center';
           const pLines = _wrapText(ctx, data.productName, IW);
@@ -3378,11 +3996,11 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
 
         // ── Category & Tag pills ──
         const pills = [];
-        if (data.category) pills.push({ text: '🏷 ' + data.category, bg: 'rgba(212,168,72,0.15)', border: 'rgba(212,168,72,0.4)', color: GOLD2 });
-        if (data.tag)      pills.push({ text: '✨ ' + data.tag,      bg: 'rgba(168,240,184,0.08)', border: 'rgba(168,240,184,0.3)', color: GREEN_LT });
+        if (data.category) pills.push({ text: '🏷 ' + data.category, bg: 'rgba(201,123,61,0.16)', border: 'rgba(201,123,61,0.42)', color: GOLD2 });
+        if (data.tag)      pills.push({ text: '✨ ' + data.tag,      bg: 'rgba(124,242,176,0.08)', border: 'rgba(124,242,176,0.32)', color: GREEN_LT });
 
         if (pills.length) {
-          ctx.font = '500 20px Arial, sans-serif';
+          ctx.font = `600 20px ${FONT_BODY}`;
           const pillH = 38, pillPadX = 20, gap = 14;
           const pillWidths = pills.map(p => ctx.measureText(p.text).width + pillPadX * 2);
           const totalW = pillWidths.reduce((a, b) => a + b, 0) + gap * (pills.length - 1);
@@ -3405,10 +4023,10 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
           const cardH = data.mrp ? 120 : 82;
           _roundRect(ctx, PAD, y, IW, cardH, 16);
           const cardGrad = ctx.createLinearGradient(PAD, y, PAD + IW, y + cardH);
-          cardGrad.addColorStop(0, 'rgba(60,180,90,0.12)');
-          cardGrad.addColorStop(1, 'rgba(30,100,50,0.08)');
+          cardGrad.addColorStop(0, 'rgba(124,242,176,0.10)');
+          cardGrad.addColorStop(1, 'rgba(20,90,60,0.10)');
           ctx.fillStyle = cardGrad; ctx.fill();
-          ctx.strokeStyle = 'rgba(100,220,130,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.strokeStyle = 'rgba(124,242,176,0.28)'; ctx.lineWidth = 1.5; ctx.stroke();
 
           if (data.saveText) {
             // OFFER badge
@@ -3417,22 +4035,22 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
             const bGrad = ctx.createLinearGradient(W - PAD - badgeW, y, W - PAD, y + badgeH);
             bGrad.addColorStop(0, '#c0392b'); bGrad.addColorStop(1, '#e74c3c');
             ctx.fillStyle = bGrad; ctx.fill();
-            ctx.font = 'bold 17px Arial, sans-serif';
+            ctx.font = `700 17px ${FONT_BODY}`;
             ctx.fillStyle = WHITE; ctx.textAlign = 'center';
             ctx.fillText('🔥 SAVE ' + data.saveText, W - PAD - badgeW/2, y + 37);
           }
 
           // Main price
-          ctx.font = 'bold 46px Georgia, serif';
+          ctx.font = `700 46px ${FONT_HEAD}`;
           const priceGrad = ctx.createLinearGradient(PAD + 24, y, PAD + 250, y + 50);
-          priceGrad.addColorStop(0, '#6ef07e'); priceGrad.addColorStop(1, '#a8f0b8');
+          priceGrad.addColorStop(0, '#5be88e'); priceGrad.addColorStop(1, '#bff7d4');
           ctx.fillStyle = priceGrad;
           ctx.textAlign = 'left';
           ctx.fillText(data.price, PAD + 24, y + 56);
 
           if (data.mrp) {
             // MRP strikethrough
-            ctx.font = '500 22px Arial, sans-serif';
+            ctx.font = `500 22px ${FONT_BODY}`;
             ctx.fillStyle = GREEN_DIM;
             ctx.fillText('MRP ' + data.mrp, PAD + 24, y + 90);
             const mrpW = ctx.measureText('MRP ' + data.mrp).width;
@@ -3448,9 +4066,9 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         // ── Offer validity ──
         if (data.offerValid) {
           _roundRect(ctx, PAD, y, IW, 44, 10);
-          ctx.fillStyle = 'rgba(255,200,80,0.07)'; ctx.fill();
-          ctx.strokeStyle = 'rgba(255,200,80,0.25)'; ctx.lineWidth = 1; ctx.stroke();
-          ctx.font = '500 20px Arial, sans-serif';
+          ctx.fillStyle = 'rgba(240,184,96,0.08)'; ctx.fill();
+          ctx.strokeStyle = 'rgba(240,184,96,0.28)'; ctx.lineWidth = 1; ctx.stroke();
+          ctx.font = `500 20px ${FONT_BODY}`;
           ctx.fillStyle = '#FFD580'; ctx.textAlign = 'center';
           ctx.fillText('⏰  Offer valid ' + data.offerValid, W/2, y + 29);
           y += 58;
@@ -3458,7 +4076,7 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
 
         // ── Description ──
         if (data.description) {
-          ctx.font = 'italic 21px Georgia, serif';
+          ctx.font = `italic 600 21px ${FONT_HEAD}`;
           ctx.fillStyle = GREEN_DIM;
           ctx.textAlign = 'center';
           const dLines = _wrapText(ctx, '📝 ' + data.description, IW);
@@ -3470,33 +4088,40 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         y += 10;
         const div2 = ctx.createLinearGradient(0, 0, W, 0);
         div2.addColorStop(0,   'transparent');
-        div2.addColorStop(0.3, 'rgba(212,168,72,0.35)');
-        div2.addColorStop(0.7, 'rgba(212,168,72,0.35)');
+        div2.addColorStop(0.3, 'rgba(201,123,61,0.38)');
+        div2.addColorStop(0.7, 'rgba(201,123,61,0.38)');
         div2.addColorStop(1,   'transparent');
         ctx.strokeStyle = div2; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
-        y += 22;
+        y += 26;
 
-        // ── Location + contact row ──
-        ctx.font = '500 20px Arial, sans-serif';
+        // ── Call / WhatsApp CTA button — replaces old location + dealer-rates line ──
+        ctx.font = `700 21px ${FONT_BODY}`;
+        const ctaText = '📞 Call / WhatsApp: ' + SHOP_PHONE.replace(/(\d{5})(\d{5})/, '$1 $2') + '  to Order';
+        const ctaPadX = 30, ctaH = 54;
+        const ctaW = ctx.measureText(ctaText).width + ctaPadX * 2;
+        const ctaX = (W - ctaW) / 2;
+        _roundRect(ctx, ctaX, y, ctaW, ctaH, ctaH/2);
+        const ctaGrad = ctx.createLinearGradient(ctaX, y, ctaX + ctaW, y + ctaH);
+        ctaGrad.addColorStop(0, '#1f8f5f'); ctaGrad.addColorStop(1, '#27ae60');
+        ctx.fillStyle = ctaGrad; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = WHITE;
         ctx.textAlign = 'center';
-        const footerY = y + 22;
-        if (data.location) {
-          ctx.fillStyle = GREEN_DIM;
-          ctx.fillText('📍 ' + data.location + '   📦 Contact us for bulk orders & dealer rates!', W/2, footerY);
-          y += 36;
-        }
+        ctx.fillText(ctaText, W/2, y + ctaH/2 + 7);
+        y += ctaH + 26;
 
         // ── Tagline ──
-        y += 8;
-        ctx.font = 'italic bold 20px Georgia, serif';
-        ctx.fillStyle = GOLD;
+        ctx.font = `italic 700 20px ${FONT_HEAD}`;
+        ctx.fillStyle = GOLD2;
         ctx.textAlign = 'center';
-        ctx.fillText('Sivasakthi Marketing – Quality you can trust 🛋️', W/2, y + 20);
-        y += 44;
+        ctx.fillText('Sivasakthi Marketing – Quality you can trust 🛋️', W/2, y + 4);
+        y += 36;
 
         resolve(canvas.toDataURL('image/jpeg', 0.94));
       };
+
+      const FOOTER_BLOCK_H = 116; // CTA pill + tagline, replaces old single-line footer
 
       if (!imgBase64) {
         // Text-only card: estimate height
@@ -3505,54 +4130,49 @@ Sathankulam (Tk), Thoothukudi - 628653</a></li>
         const tCtx = tmpC.getContext('2d');
         let estH = 60; // top pad
         if (data.shopName)     estH += 80;
-        if (data.productName)  { tCtx.font = 'bold 34px Georgia,serif'; estH += _wrapText(tCtx, data.productName, W - 96).length * 42 + 16; }
+        if (data.productName)  { tCtx.font = `700 34px ${FONT_HEAD}`; estH += _wrapText(tCtx, data.productName, W - 96).length * 42 + 16; }
         if (data.category || data.tag) estH += 60;
         if (data.price)        estH += data.mrp ? 138 : 100;
         if (data.offerValid)   estH += 58;
         if (data.description)  estH += 60;
-        estH += 120; // footer
+        estH += FOOTER_BLOCK_H;
         const canvas = document.createElement('canvas');
         canvas.width = W; canvas.height = estH;
-        _drawCard(canvas, 0);
+        _drawCard(canvas, 0, null);
         return;
       }
 
       const img = new Image();
       img.onload = () => {
-        // Fit image: max height 520px, maintain aspect
-        const maxImgH = 520;
-        let imgH = Math.round((img.height / img.width) * W);
-        if (imgH > maxImgH) imgH = maxImgH;
+        // Contain-fit the whole product inside a fixed-height stage — never crop or over-zoom
+        const maxImgH = 480;
+        const scale = Math.min(W / img.width, maxImgH / img.height);
+        const dw = Math.round(img.width * scale), dh = Math.round(img.height * scale);
+        const dx = Math.round((W - dw) / 2), dy = Math.round((maxImgH - dh) / 2);
+        const imgH = maxImgH;
 
-        // Draw image portion
+        // Detect the product's own dominant colour and build a matching studio backdrop palette
+        const dominant = _detectDominantColor(img);
+        const palette = _studioPaletteFromColor(dominant);
+
+        // Estimate text block height below the image
         const tmpC = document.createElement('canvas');
         tmpC.width = W; tmpC.height = 10;
         const tCtx = tmpC.getContext('2d');
         let estTextH = 60;
         if (data.shopName)     estTextH += 80;
-        if (data.productName)  { tCtx.font = 'bold 34px Georgia,serif'; estTextH += _wrapText(tCtx, data.productName, W - 96).length * 42 + 16; }
+        if (data.productName)  { tCtx.font = `700 34px ${FONT_HEAD}`; estTextH += _wrapText(tCtx, data.productName, W - 96).length * 42 + 16; }
         if (data.category || data.tag) estTextH += 60;
         if (data.price)        estTextH += data.mrp ? 138 : 100;
         if (data.offerValid)   estTextH += 58;
         if (data.description)  estTextH += 60;
-        estTextH += 130;
+        estTextH += FOOTER_BLOCK_H;
 
         const canvas = document.createElement('canvas');
         canvas.width  = W;
         canvas.height = imgH + estTextH;
-        const ctx = canvas.getContext('2d');
 
-        // White image background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, W, imgH);
-
-        // Draw image centered/cropped to fit
-        const scale = Math.max(W / img.width, imgH / img.height);
-        const dw = img.width * scale, dh = img.height * scale;
-        const dx = (W - dw) / 2, dy = (imgH - dh) / 2;
-        ctx.drawImage(img, dx, dy, dw, dh);
-
-        _drawCard(canvas, imgH);
+        _drawCard(canvas, imgH, { img, dx, dy, dw, dh, palette });
       };
       img.onerror = () => resolve(null);
       img.src = imgBase64;
